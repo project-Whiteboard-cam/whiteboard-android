@@ -1,0 +1,3 @@
+include ':app'
+rootProject.name = "new Cam"
+include ':openCVLibrary3411'
