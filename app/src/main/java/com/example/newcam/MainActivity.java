@@ -1,5 +1,6 @@
 package com.example.newcam;
 
+import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,21 +11,35 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.Surface;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Toast;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.CameraRenderer;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
     private int CAMERA_PERMISSION_CODE = 1;
     CameraBridgeViewBase cameraBridgeViewBase;
     BaseLoaderCallback baseLoaderCallback;
+    boolean Start;
+    Mat drawing=null;
+    List<MatOfPoint> contours = null;
+    Size gaussianKernel;
+    Mat hierarchy = null;
+    Mat frame = null;
+    Scalar color;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
 
         setContentView(R.layout.activity_main);
+
 
         cameraBridgeViewBase = (JavaCameraView) findViewById(R.id.CameraView);
         cameraBridgeViewBase.setMaxFrameSize(1280, 720);
@@ -58,6 +74,32 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 }
             }
         };
+    }
+
+    @Override
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+            frame = null;
+            drawing = null;
+            contours = null;
+            hierarchy = null;
+            System.gc();
+
+
+            frame = inputFrame.gray();
+        if (Start) {
+            contours = new ArrayList<>();
+            //Mat res = frame.clone();
+            hierarchy = new Mat();
+            //Imgproc.cvtColor(frame, frame, Imgproc.COLOR_RGBA2GRAY);
+            Imgproc.GaussianBlur(frame,frame, gaussianKernel, 0);
+            Imgproc.Canny(frame, frame, 100, 200);
+            Imgproc.findContours(frame, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+            drawing = Mat.zeros(frame.size(), CvType.CV_8UC3);
+            Imgproc.drawContours(drawing,contours, -1, color, 3);
+
+            return drawing;
+        }
+        return frame;
     }
 
     private void requestCameraPermission() {
@@ -86,6 +128,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     }
 
+    public void initiateProcess(View Button) {
+        Start=!Start;
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         //super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -100,6 +146,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     @Override
     public void onCameraViewStarted(int width, int height) {
+        Start = false;
+
+        gaussianKernel = new Size(3,3);
+
+        color = new Scalar(0,255,0);
 
     }
 
@@ -133,11 +184,5 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         if (cameraBridgeViewBase != null) {
             cameraBridgeViewBase.disableView();
         }
-    }
-
-    @Override
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        Mat frame = inputFrame.rgba();
-        return frame;
     }
 }
