@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     Mat hierarchy = null;
     Mat frame = null;
     Scalar color;
-
+    double minWhiteBoardArea = 100000;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,12 +90,36 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             contours = new ArrayList<>();
             //Mat res = frame.clone();
             hierarchy = new Mat();
+            double largeContourArea = 0;
+            int largeContourIndex = 0;
             //Imgproc.cvtColor(frame, frame, Imgproc.COLOR_RGBA2GRAY);
             Imgproc.GaussianBlur(frame,frame, gaussianKernel, 0);
             Imgproc.Canny(frame, frame, 100, 200);
             Imgproc.findContours(frame, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
             drawing = Mat.zeros(frame.size(), CvType.CV_8UC3);
-            Imgproc.drawContours(drawing,contours, -1, color, 3);
+            //Imgproc.drawContours(drawing,contours, -1, color, 3);
+
+            if (contours.size() > 0) {
+
+                //finding largest contour
+
+                for (int index=0; index < contours.size(); index++) {
+                    double contourArea = Imgproc.contourArea(contours.get(index));
+                    if (contourArea > largeContourArea) {
+                        largeContourArea = contourArea;
+                        largeContourIndex = index;
+                    }
+                }
+
+                //drawing only largest contour
+                if (largeContourArea > minWhiteBoardArea) {
+                    Imgproc.drawContours(drawing, contours, largeContourIndex, color, 3);
+                }
+                else {
+                    Imgproc.drawContours(drawing,contours, -1, color, 3);                }
+
+            }
+
 
             return drawing;
         }
