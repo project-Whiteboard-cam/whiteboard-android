@@ -22,6 +22,8 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -34,13 +36,18 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     CameraBridgeViewBase cameraBridgeViewBase;
     BaseLoaderCallback baseLoaderCallback;
     boolean Start;
-    Mat drawing=null;
+    Mat drawing = null;
     List<MatOfPoint> contours = null;
     Size gaussianKernel;
     Mat hierarchy = null;
     Mat frame = null;
+    Point[] points = null;
+    Mat mask = null;
+    List<MatOfPoint> LargeContourArray = null;
     Scalar color;
+    MatOfPoint2f approx = null;
     double minWhiteBoardArea = 100000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,32 +85,34 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-            frame = null;
-            drawing = null;
-            contours = null;
-            hierarchy = null;
-            System.gc();
+        frame = null;
+        drawing = null;
+        contours = null;
+        approx = null;
+        hierarchy = null;
+
+        points = null;
+        System.gc();
 
 
-            frame = inputFrame.gray();
+        frame = inputFrame.gray();
         if (Start) {
             contours = new ArrayList<>();
             //Mat res = frame.clone();
             hierarchy = new Mat();
             double largeContourArea = 0;
+
             int largeContourIndex = 0;
-            //Imgproc.cvtColor(frame, frame, Imgproc.COLOR_RGBA2GRAY);
-            Imgproc.GaussianBlur(frame,frame, gaussianKernel, 0);
+            Imgproc.GaussianBlur(frame, frame, gaussianKernel, 0);
             Imgproc.Canny(frame, frame, 100, 200);
             Imgproc.findContours(frame, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
             drawing = Mat.zeros(frame.size(), CvType.CV_8UC3);
-            //Imgproc.drawContours(drawing,contours, -1, color, 3);
 
             if (contours.size() > 0) {
 
                 //finding largest contour
 
-                for (int index=0; index < contours.size(); index++) {
+                for (int index = 0; index < contours.size(); index++) {
                     double contourArea = Imgproc.contourArea(contours.get(index));
                     if (contourArea > largeContourArea) {
                         largeContourArea = contourArea;
@@ -113,10 +122,23 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
                 //drawing only largest contour
                 if (largeContourArea > minWhiteBoardArea) {
-                    Imgproc.drawContours(drawing, contours, largeContourIndex, color, 3);
+                    MatOfPoint2f largeContour = new MatOfPoint2f(contours.get(largeContourIndex).toArray());
+                    double epsilon = Imgproc.arcLength(largeContour,true);
+                    approx = new MatOfPoint2f();
+                    Imgproc.approxPolyDP(largeContour, approx, 0.1*epsilon, true);
+                    Point[] points = approx.toArray();
+
+                    if (points.length == 4) {
+                        System.out.println("4 points found");
+                        LargeContourArray = new ArrayList<>();
+                        LargeContourArray.add(new MatOfPoint(points));
+                        Imgproc.drawContours(drawing, LargeContourArray, 0,color, -1);
+                    }
+
+
+                } else {
+                    Imgproc.drawContours(drawing, contours, -1, color, 3);
                 }
-                else {
-                    Imgproc.drawContours(drawing,contours, -1, color, 3);                }
 
             }
 
@@ -153,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     }
 
     public void initiateProcess(View Button) {
-        Start=!Start;
+        Start = !Start;
     }
 
     @Override
@@ -172,9 +194,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     public void onCameraViewStarted(int width, int height) {
         Start = false;
 
-        gaussianKernel = new Size(3,3);
+        gaussianKernel = new Size(3, 3);
 
-        color = new Scalar(0,255,0);
+        color = new Scalar(0, 255, 0);
 
     }
 
