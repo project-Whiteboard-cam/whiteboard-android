@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     CameraBridgeViewBase cameraBridgeViewBase;
     BaseLoaderCallback baseLoaderCallback;
 
-    Scalar whiteColor = new Scalar(255,255,255);
+    Scalar whiteColor = new Scalar(255, 255, 255);
     boolean Start;
     boolean boardDetected;
 
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     Size roiGaussianKernel;
 
     Rect rectangle;
-    Rect roi=null;
+    Rect roi = null;
     Scalar greenColor;
     Scalar redColor;
     Scalar blueColor;
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         points = null;
         originalFrame = null;
-        tempFrame= null;
+        tempFrame = null;
 
         System.gc();
     }
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         tempFrame = inputFrame.rgba();
         frame = new Mat();
-        Imgproc.cvtColor(tempFrame,frame, Imgproc.COLOR_RGBA2GRAY);
+        Imgproc.cvtColor(tempFrame, frame, Imgproc.COLOR_RGBA2GRAY);
         originalFrame = frame.clone();
 
         //apply gaussian blur
@@ -188,11 +188,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     rectangle = Imgproc.boundingRect(reqContour);
                     LargeContourArray = new ArrayList<>();
                     LargeContourArray.add(reqContour);
-                    Imgproc.drawContours(tempFrame, LargeContourArray, 0, redColor , 3);
-                    Imgproc.rectangle(tempFrame,rectangle.tl(),rectangle.br(),greenColor,3);
+                    Imgproc.drawContours(tempFrame, LargeContourArray, 0, redColor, 3);
+                    Imgproc.rectangle(tempFrame, rectangle.tl(), rectangle.br(), greenColor, 3);
                     boardMask = null;
                     boardMask = Mat.zeros(frame.size(), CvType.CV_8UC1);
-                    Imgproc.drawContours(boardMask, LargeContourArray, 0, new Scalar(255) , -1);
+                    Imgproc.drawContours(boardMask, LargeContourArray, 0, new Scalar(255), -1);
                     boardDetected = true;
                 }
 
@@ -200,14 +200,14 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
 
         if (Start) {
-            if (boardDetected){
-                Core.bitwise_and(originalFrame,boardMask,originalFrame);
-                roi = new Rect(rectangle.x,rectangle.y,rectangle.width,rectangle.height);
+            if (boardDetected) {
+                Core.bitwise_and(originalFrame, boardMask, originalFrame);
+                roi = new Rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
                 imageROI = originalFrame.submat(roi);
 
                 //apply blur on the roi
-                Imgproc.GaussianBlur(imageROI, imageROI, roiGaussianKernel,0);
-                Imgproc.threshold(imageROI,imageROI,0,255, Imgproc.THRESH_BINARY_INV+Imgproc.THRESH_TRIANGLE);
+                Imgproc.GaussianBlur(imageROI, imageROI, roiGaussianKernel, 0);
+                Imgproc.threshold(imageROI, imageROI, 0, 255, Imgproc.THRESH_BINARY_INV + Imgproc.THRESH_TRIANGLE);
 
                 //find text contours
                 boardContours = new ArrayList<>();
@@ -218,21 +218,19 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
                 board = Mat.ones(frame.size(), CvType.CV_8UC3).setTo(whiteColor);
 
-                boardROI = board.submat(new Rect((board.cols()-rectangle.width)/2,(board.rows()-rectangle.height)/2,rectangle.width,rectangle.height));
+                boardROI = board.submat(new Rect((board.cols() - rectangle.width) / 2, (board.rows() - rectangle.height) / 2, rectangle.width, rectangle.height));
                 //Imgproc.drawContours(boardROI, boardContours, -1, blueColor , -1);
                 for (int index = 0; index < boardContours.size(); index++) {
                     double contourArea = Imgproc.contourArea(boardContours.get(index));
                     if ((contourArea > maxNoiseArea) && (contourArea < minHandArea)) {
-                        Imgproc.drawContours(boardROI, boardContours, index, blueColor , -1);
+                        Imgproc.drawContours(boardROI, boardContours, index, blueColor, -1);
                     }
                 }
-
 
 
                 //Find required center position of image
                 //board.submat(new Rect(0,0,rectangle.width,rectangle.height)).copyTo(imageROI);
                 //imageROI.copyTo(board.submat(new Rect(0,0,rectangle.width,rectangle.height)));
-
 
 
                 return board;
@@ -345,9 +343,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         gaussianKernel = new Size(3, 3);
         boardDetected = false;
         greenColor = new Scalar(0, 255, 0);
-        redColor = new Scalar(255,0,0);
-        blueColor = new Scalar(0,0,255);
-        roiGaussianKernel = new Size(3,3);
+        redColor = new Scalar(255, 0, 0);
+        blueColor = new Scalar(0, 0, 255);
+        roiGaussianKernel = new Size(3, 3);
 
     }
 
