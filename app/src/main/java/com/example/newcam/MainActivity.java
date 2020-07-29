@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.android.JavaCamera2View;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
@@ -31,6 +32,8 @@ import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.List;
+
+
 
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
     private int CAMERA_PERMISSION_CODE = 1;
@@ -88,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         setContentView(R.layout.activity_main);
 
 
-        cameraBridgeViewBase = (JavaCameraView) findViewById(R.id.CameraView);
+        cameraBridgeViewBase = (JavaCamera2View) findViewById(R.id.CameraView);
         cameraBridgeViewBase.setMaxFrameSize(1280, 720);
         cameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
         cameraBridgeViewBase.setCvCameraViewListener(this);
