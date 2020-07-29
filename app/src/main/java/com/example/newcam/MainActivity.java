@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.SurfaceView;
 import android.view.View;
@@ -53,8 +54,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     Mat originalFrame = null;
     Mat imageROI = null;
     Mat boardROI = null;
-
-
+    Mat erodeKernel = null;
+    Mat dilateKernel = null;
     Point[] points = null;
 
     List<MatOfPoint> LargeContourArray = null;
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
 
         setContentView(R.layout.activity_main);
+
 
 
         cameraBridgeViewBase = (JavaCamera2View) findViewById(R.id.CameraView);
@@ -216,7 +218,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 boardHierarchy = new Mat();
                 boardContentMask = null;
                 boardContentMask = Mat.zeros(imageROI.size(), CvType.CV_8UC1);
-                Imgproc.findContours(imageROI, boardContours, boardHierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+
+                //Imgproc.erode(imageROI,imageROI,dilateKernel);
+                //Imgproc.dilate(imageROI,imageROI,dilateKernel);
+                Imgproc.findContours(imageROI, boardContours, boardHierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
                 board = Mat.ones(frame.size(), CvType.CV_8UC3).setTo(whiteColor);
 
@@ -347,7 +352,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         greenColor = new Scalar(0, 255, 0);
         redColor = new Scalar(255, 0, 0);
         blueColor = new Scalar(0, 0, 255);
-        roiGaussianKernel = new Size(3, 3);
+        roiGaussianKernel = new Size(7, 7);
+        int erosion_kernel_size = 5;
+        erodeKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(erosion_kernel_size, erosion_kernel_size));
+        dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(3, 3));
 
     }
 
