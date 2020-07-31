@@ -145,6 +145,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         tempFrame = inputFrame.rgba();
         frame = new Mat();
+
+        //We intentionally flipped the frame to adjust the screen to our proposed way of placing camera
+        Core.flip(tempFrame,tempFrame,-1);
+
+
         Imgproc.cvtColor(tempFrame, frame, Imgproc.COLOR_RGBA2GRAY);
         originalFrame = frame.clone();
 
