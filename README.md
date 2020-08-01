@@ -36,3 +36,6 @@ The generated content will be more clear and will be mostly similar to content g
 7. This application can be used for both live classes and recorded classes that can be uploaded online.
 With this application, we want to help all the inspiring teachers who are working hard to help students in hard times.
 
+### project roadmap
+![Solution roadmap](https://github.com/project-Whiteboard-cam/whiteboard-android/blob/master/project%20Whiteboard%20roadmap.jpg)
+
