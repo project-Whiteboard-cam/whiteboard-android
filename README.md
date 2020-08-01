@@ -20,19 +20,19 @@ Being a student of Computer Science and being a teacher who teaches online. I an
 Using the techniques of Image processing our software converts the feed from a camera as computer graphics illustration. It also provides realtime captions to the teacher speech using "IBM Watson speech to text" to make the classes more accessible to the students.
 
 #### How it Works:
-1.Place a small whiteboard (as most of the content is being consumed using smartphones) or a white paper in front of the camera. And start teaching on it.
-2.The application detects the board in the camera and removes all the extra things outside of the board.
-3.Using image processing pipeline created by us, the application detects the letters or other content written on the board and redraws that content on a white background.
-4.Parallelly application listens to the microphone and generates captions to the speech of the teacher.
+1. Place a small whiteboard (as most of the content is being consumed using smartphones) or a white paper in front of the camera. And start teaching on it.
+2. The application detects the board in the camera and removes all the extra things outside of the board.
+3. Using image processing pipeline created by us, the application detects the letters or other content written on the board and redraws that content on a white background.
+4. Parallelly application listens to the microphone and generates captions to the speech of the teacher.
 The generated content will be more clear and will be mostly similar to content generated from a touch screen device. And can be shared online using screen share technology of video conferencing applications.
 
 ##### Advantages:
-1.We can achieve the results of using an expensive screen touch device at no cost by using our application.
-2.No extra hardware is required. It requires only the camera on your device.
-3.Runs on both personal computers and smartphones.
-4.Generate the required content in no time. It takes the same amount of time that you need to write on a board.
-5.Provides real-time captions for the speaker's speech.
-6.Work would be faster, better and less expensive.
-7.This application can be used for both live classes and recorded classes that can be uploaded online.
+1. We can achieve the results of using an expensive screen touch device at no cost by using our application.
+2. No extra hardware is required. It requires only the camera on your device.
+3. Runs on both personal computers and smartphones.
+4. Generate the required content in no time. It takes the same amount of time that you need to write on a board.
+5. Provides real-time captions for the speaker's speech.
+6. Work would be faster, better and less expensive.
+7. This application can be used for both live classes and recorded classes that can be uploaded online.
 With this application, we want to help all the inspiring teachers who are working hard to help students in hard times.
 
